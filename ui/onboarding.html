@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Welcome to Savestate</title>
+  <style>
+    :root {
+      --night-sky: #0a0e27;
+      --deep-space: #141b3d;
+      --nebula-purple: #2d1b69;
+      --star-blue: #4a90e2;
+      --moon-glow: #6c9bcf;
+      --comet-tail: #8ab4f8;
+      --star-white: #e8eaed;
+      --nebula-pink: #c678dd;
+      --meteor-orange: #ff9e64;
+      --text-primary: #e8eaed;
+      --text-secondary: #9aa0a6;
+      --border-color: rgba(138, 180, 248, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;      background: linear-gradient(180deg, var(--night-sky) 0%, var(--deep-space) 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 24px;
+      background: linear-gradient(135deg, var(--star-blue), var(--comet-tail));
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo svg {
+      width: 48px;
+      height: 48px;
+      color: var(--night-sky);
+      stroke-width: 2;
+    }
+
+    h1 {
+      font-size: 32px;
+      text-align: center;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }secondary);
+      line-height: 1.6;
+    }
+
+    .permissions-box {
+      background: rgba(45, 27, 105, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 32px;
+    }
+
+    .permissions-box h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--meteor-orange);
+      margin-bottom: 16px;
+    }
+
+    .permissions-list {
+      list-style: none;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+
+    .permissions-list li:before {
+      content: "✓ ";
+      color: var(--star-blue);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      flex: 1;
+      padding: 16px;
+      min-height: 52px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      touch-action: manipulation;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--star-blue), var(--comet-tail));
+      color: var(--night-sky);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:active {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(74, 144, 226, 0.3);
+    }
+
+    .btn-secondary {
+      background: rgba(74, 144, 226, 0.1);
+      color: var(--star-blue);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover,
+    .btn-secondary:active {
+      background: rgba(74, 144, 226, 0.2);
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 28px;
+      }
+
+      .container {
+        padding: 20px 12px;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M12 3c-1.7 0-3 1.3-3 3v3h6V6c0-1.7-1.3-3-3-3z"/>
+        <rect x="5" y="9" width="14" height="10" rx="2"/>
+      </svg>
+    </div>
+
+    <h1>Savestate</h1>
+    <p class="subtitle">Save and restore your incognito browsing sessions</p>
+
+    <div class="features">
+      <div class="feature">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        <div class="feature-text">
+          <h3>Auto-Save Tabs</h3>
+          <p>Automatically save tabs as you open them in incognito mode</p>
+        </div>
+      </div>
+
+      <div class="feature">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M3 12h18M3 6h18M3 18h18"/>
+        </svg>
+        <div class="feature-text">
+          <h3>Session Management</h3>
+          <p>Organize tabs into logical session groups</p>
+        </div>
+      </div>
+
+      <div class="feature">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M11 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-5m-7 1l7-7m0 0v5m0-5h-5"/>
+        </svg>
+        <div class="feature-text">
+          <h3>One-Click Restore</h3>
+          <p>Restore entire sessions with a single tap</p>
+        </div>
+      </div>
+
+      <div class="feature">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div class="feature-text">
+          <h3>Privacy First</h3>
+          <p>All data stored locally - no cloud sync, no tracking</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="permissions-box">
+      <h3>⚠️ Important: Enable Incognito Access</h3>
+      <ul class="permissions-list">
+        <li>Access incognito tabs and URLs</li>
+        <li>Local storage for session data</li>
+        <li>No server communication</li>
+        <li>No personal data collection</li>
+      </ul>
+      <div style="margin-top: 16px; padding: 16px; background: rgba(255, 158, 100, 0.1); border: 1px solid rgba(255, 158, 100, 0.3); border-radius: 8px;">
+        <p style="font-size: 14px; line-height: 1.6; margin-bottom: 12px;">
+          <strong>📱 To enable incognito access:</strong>
+        </p>
+        <ol style="font-size: 13px; line-height: 1.8; margin-left: 20px; color: var(--text-secondary);">
+          <li>Open Chrome menu (⋮) → <strong>Extensions</strong> → <strong>Manage Extensions</strong></li>
+          <li>Find <strong>Savestate</strong></li>
+          <li>Tap <strong>Details</strong></li>
+          <li>Enable <strong>"Allow in incognito"</strong></li>
+        </ol>
+        <p style="font-size: 13px; margin-top: 12px; color: var(--meteor-orange); font-weight: 600;">
+          ⚠️ Without this permission, the extension cannot save your incognito tabs!
+        </p>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button class="btn-primary" id="startBtn">Get Started</button>
+      <button class="btn-secondary" id="laterBtn">Later</button>
+    </div>
+  </div>
+
+  <script src="onboarding.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Incognito Tab Saver - Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="1"/>
+          <circle cx="19" cy="12" r="1"/>
+          <circle cx="5" cy="12" r="1"/>
+        </svg>
+        Settings
+      </h1>
+    </header>
+
+    <div class="settings-panel">
+      <section class="setting-group">
+        <h2>Session Management</h2>
+
+        <div class="setting-item">
+          <label for="autoDelete">
+            <input type="checkbox" id="autoDelete">
+            <span>Auto-delete old sessions</span>
+          </label>
+          <span class="helper-text">Automatically remove sessions older than the retention period</span>
+        </div>
+
+        <div class="setting-item">
+          <label for="retentionDays">Retention Period (days):</label>
+          <div class="input-group">
+            <input 
+              type="number" 
+              id="retentionDays" 
+              min="1" 
+              max="365" 
+              value="30"
+              required
+              oninvalid="this.setCustomValidity('Please enter a value between 1 and 365')"
+              oninput="this.setCustomValidity('')"
+            >
+            <span class="helper-text">Delete sessions older than this many days (1-365, if auto-delete enabled)</span>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <label for="deduplicateTabs">
+            <input type="checkbox" id="deduplicateTabs" checked>
+            <span>Deduplicate tabs by URL</span>
+          </label>
+          <span class="helper-text">Prevent saving multiple tabs with the same URL in a session</span>
+        </div>
+      </section>
+
+      <section class="setting-group">
+        <h2>Storage & Privacy</h2>
+        
+        <div class="storage-info">
+          <div class="storage-label">Storage Usage:</div>
+          <div class="storage-bar">
+            <div class="storage-used" id="storageUsed"></div>
+          </div>
+          <div class="storage-text" id="storageText">Calculating...</div>
+        </div>
+
+        <button id="clearAllBtn" class="danger-btn">Clear All Sessions</button>
+      </section>
+
+      <section class="setting-group">
+        <h2>About</h2>
+        <p class="about-text">
+          <strong>Incognito Tab Saver v1.0.0</strong><br>
+          Save and restore incognito browsing sessions on Android Chrome browsers.
+        </p>
+        <p class="about-text">
+          All data is stored locally on your device. No data is sent to external servers.
+        </p>
+      </section>
+    </div>
+
+    <footer>
+      <button id="saveBtn" class="primary-btn">Save Settings</button>
+      <button id="resetBtn" class="secondary-btn">Reset to Defaults</button>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script src="options.js" defer></script>
+</body>
+</html>

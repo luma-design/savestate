@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html style="width: 400px; height: 600px;">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Popup</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 400px !important; 
+      height: 600px !important; 
+      background: #0a0e27;
+      color: white;
+      font-family: sans-serif;
+    }
+    .test-container {
+      width: 400px;
+      height: 600px;
+      padding: 20px;
+      background: linear-gradient(180deg, #0a0e27 0%, #141b3d 100%);
+    }
+    h1 { color: #4a90e2; margin-bottom: 20px; }
+    .box {
+      background: rgba(74, 144, 226, 0.1);
+      border: 1px solid rgba(138, 180, 248, 0.2);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1>Test Popup - 400x600</h1>
+    <div class="box">If you can see this properly sized, the CSS works fine.</div>
+    <div class="box">Width should be 400px</div>
+    <div class="box">Height should be 600px</div>
+    <div class="box">This is a test to verify dimensions are working</div>
+  </div>
+</body>
+</html>

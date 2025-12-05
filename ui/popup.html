@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Savestate</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Warning banner for non-incognito mode -->
+    <div id="incognitoWarning" style="display: none; background: #ff6b6b; color: white; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; line-height: 1.4;">
+      <strong>⚠️ Not in Incognito Mode</strong><br>
+      You're viewing this popup from a normal tab. Restored tabs will open in normal mode, not incognito.<br>
+      <strong>Solution:</strong> Open this popup from an incognito tab to restore tabs in incognito mode.
+    </div>
+
+    <header>
+      <h1>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M12 3c-1.7 0-3 1.3-3 3v3h6V6c0-1.7-1.3-3-3-3z"/>
+          <rect x="5" y="9" width="14" height="10" rx="2"/>
+        </svg>
+        Savestate
+      </h1>
+      <button id="newSessionBtn" class="icon-btn" title="New Session" aria-label="Create new session">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+    </header>
+
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" id="searchInput" placeholder="Search sessions..." aria-label="Search sessions">
+    </div>
+
+    <div class="current-session" id="currentSession">
+      <h2>Current Session <span class="tab-count" id="currentCount">0</span></h2>
+      <div class="tab-list" id="currentTabs">
+        <p class="empty-state">No tabs in current session</p>
+      </div>
+    </div>
+
+    <div class="saved-sessions" id="savedSessions">
+      <h2>Saved Sessions</h2>
+      <div class="session-list" id="sessionList" aria-live="polite" aria-atomic="false">
+        <p class="empty-state">No saved sessions</p>
+      </div>
+    </div>
+
+    <footer>
+      <button id="exportBtn" class="footer-btn">Export</button>
+      <button id="importBtn" class="footer-btn">Import</button>
+      <button id="settingsBtn" class="footer-btn">Settings</button>
+    </footer>
+
+    <input type="file" id="importFile" accept=".json" style="display: none;">
+  </div>
+
+  <script src="popup.js" defer></script>
+</body>
+</html>
