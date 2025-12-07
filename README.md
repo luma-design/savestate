@@ -9,7 +9,8 @@ SaveState is a Chrome extension designed to help users save and restore incognit
 - Save current incognito window as a named session.
 - Restore a saved session, opening all tabs in a new incognito window.
 - View and manage (rename, delete) saved sessions.
-- Simple and intuitive user interface.
+- Simple and intuitive user interface with a night sky theme.
+- Smooth scrolling with a fixed background gradient that extends across the entire viewport.
 
 ## Installation
 
