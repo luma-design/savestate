@@ -6,12 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Savestate</title>
   <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="popup-views.css">
 </head>
 
 <body>
   <div class="container">
-    <!-- Warning banner for non-incognito mode -->
-    <!-- Warning banner for non-incognito mode -->
     <!-- Warning banner for non-incognito mode -->
     <div id="incognitoWarning"
       style="display: none; background: #ff6b6b; color: white; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; line-height: 1.4;">
@@ -36,35 +35,102 @@
       </button>
     </header>
 
-    <div class="search-box">
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-        <circle cx="11" cy="11" r="8" />
-        <path d="m21 21-4.35-4.35" />
-      </svg>
-      <input type="text" id="searchInput" placeholder="Search sessions..." aria-label="Search sessions">
-    </div>
 
-    <div class="current-session" id="currentSession">
-      <h2>Current Session <span class="tab-count" id="currentCount">0</span></h2>
-      <div class="tab-list" id="currentTabs">
-        <p class="empty-state">No tabs in current session</p>
+
+    <div class="views-container">
+      <!-- History View (Left) -->
+      <div class="view history-view">
+        <div class="view-header" style="position: relative; justify-content: center;">
+          <h2>Session History</h2>
+          <button id="toMainFromHistoryBtn" class="nav-btn" title="Back to Saved" style="position: absolute; right: 0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="session-list" id="historyList" aria-live="polite" aria-atomic="false">
+          <p class="empty-state">No history available</p>
+        </div>
+      </div>
+
+      <!-- Main View (Center - Saved Sessions Only) -->
+      <div class="view main-view active">
+        <div class="view-header" style="position: relative; justify-content: center;">
+          <button id="toHistoryBtn" class="nav-btn" title="Go to History" style="position: absolute; left: 0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M15 18l-6-6 6-6" /> <!-- Left Arrow -->
+            </svg>
+          </button>
+          <h2>Saved Sessions</h2>
+          <button id="toCurrentBtn" class="nav-btn" title="Go to Current Session" style="position: absolute; right: 0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M9 18l6-6-6-6" /> <!-- Right Arrow -->
+            </svg>
+          </button>
+        </div>
+
+        <div class="saved-sessions" id="savedSessions">
+          <div class="session-list" id="sessionList" aria-live="polite" aria-atomic="false">
+            <p class="empty-state">No saved sessions</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Session View (Right) -->
+      <div class="view current-session-view">
+        <div class="view-header" style="position: relative; justify-content: center;">
+          <button id="toMainFromCurrentBtn" class="nav-btn" title="Back to Saved" style="position: absolute; left: 0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M15 18l-6-6 6-6" /> <!-- Left Arrow -->
+            </svg>
+          </button>
+          <h2 id="currentSessionTitle">Current Session <span class="tab-count" id="currentCount">0</span></h2>
+        </div>
+
+        <div class="session-list">
+          <div class="tab-list" id="currentTabs">
+            <p class="empty-state">No tabs in current session</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="saved-sessions" id="savedSessions">
-      <h2>Saved Sessions</h2>
-      <div class="session-list" id="sessionList" aria-live="polite" aria-atomic="false">
-        <p class="empty-state">No saved sessions</p>
+    <footer id="appFooter">
+      <div class="footer-indicator">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M18 15l-6-6-6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
       </div>
-    </div>
-
-    <footer>
-      <button id="exportBtn" class="footer-btn">Export</button>
-      <button id="importBtn" class="footer-btn">Import</button>
-      <button id="settingsBtn" class="footer-btn">Settings</button>
+      <div class="footer-content">
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input type="text" id="searchInput" placeholder="Search sessions..." aria-label="Search sessions">
+        </div>
+        <button id="settingsBtn" class="icon-btn settings-icon-btn" title="Settings" aria-label="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </button>
+      </div>
     </footer>
 
-    <input type="file" id="importFile" accept=".json" style="display: none;">
+    <!-- Save Session Modal -->
+    <div id="saveModal" class="modal-overlay" style="display: none;">
+      <div class="modal">
+        <h3>Save Session</h3>
+        <input type="text" id="sessionNameInput" placeholder="Enter session name" class="modal-input">
+        <div class="modal-actions">
+          <button id="cancelSaveBtn" class="secondary-btn">Cancel</button>
+          <button id="confirmSaveBtn" class="primary-btn">Save</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="popup.js" defer></script>

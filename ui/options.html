@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Incognito Tab Saver - Settings</title>
   <link rel="stylesheet" href="options.css">
 </head>
+
 <body>
   <div class="container">
     <header>
       <h1>
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <circle cx="12" cy="12" r="1"/>
-          <circle cx="19" cy="12" r="1"/>
-          <circle cx="5" cy="12" r="1"/>
+          <circle cx="12" cy="12" r="1" />
+          <circle cx="19" cy="12" r="1" />
+          <circle cx="5" cy="12" r="1" />
         </svg>
         Settings
       </h1>
@@ -32,18 +34,19 @@
         </div>
 
         <div class="setting-item">
+          <label for="promptForName">
+            <input type="checkbox" id="promptForName" checked>
+            <span>Prompt for session name on manual save</span>
+          </label>
+          <span class="helper-text">Ask for a custom name when manually creating a session</span>
+        </div>
+
+        <div class="setting-item">
           <label for="retentionDays">Retention Period (days):</label>
           <div class="input-group">
-            <input 
-              type="number" 
-              id="retentionDays" 
-              min="1" 
-              max="365" 
-              value="30"
-              required
+            <input type="number" id="retentionDays" min="1" max="365" value="30" required
               oninvalid="this.setCustomValidity('Please enter a value between 1 and 365')"
-              oninput="this.setCustomValidity('')"
-            >
+              oninput="this.setCustomValidity('')">
             <span class="helper-text">Delete sessions older than this many days (1-365, if auto-delete enabled)</span>
           </div>
         </div>
@@ -58,8 +61,31 @@
       </section>
 
       <section class="setting-group">
+        <h2>Backup & Restore</h2>
+        <div class="setting-item action-row">
+          <button id="exportBtn" class="action-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Export Sessions
+          </button>
+          <button id="importBtn" class="action-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Import Sessions
+          </button>
+          <input type="file" id="importFile" accept=".json" style="display: none;">
+        </div>
+      </section>
+
+      <section class="setting-group">
         <h2>Storage & Privacy</h2>
-        
+
         <div class="storage-info">
           <div class="storage-label">Storage Usage:</div>
           <div class="storage-bar">
@@ -93,4 +119,5 @@
 
   <script src="options.js" defer></script>
 </body>
+
 </html>

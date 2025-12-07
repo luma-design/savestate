@@ -1,0 +1,119 @@
+/* View Container & Sliding Logic - Three Views */
+.views-container {
+    display: flex;
+    flex-flow: row nowrap;
+    /* Three views side-by-side */
+    width: 300%;
+    height: 100%;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* Default: Show Center (Main/Saved) View */
+    transform: translateX(-33.333%);
+    flex: 1;
+    overflow: hidden;
+    /* Hide scrollbars during transition */
+}
+
+.view {
+    width: 33.333%;
+    /* One-third each */
+    flex-shrink: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: transparent;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Hide inactive views */
+.views-container.show-history .main-view,
+.views-container.show-history .current-session-view {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.views-container.show-main .history-view,
+.views-container.show-main .current-session-view {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.views-container.show-current .history-view,
+.views-container.show-current .main-view {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Ensure footer doesn't overlap - handled by .container padding-bottom */
+.view-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    min-height: 32px;
+}
+
+.view-header h2 {
+    margin-bottom: 0;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    color: var(--star-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    min-width: 32px;
+    min-height: 32px;
+}
+
+/* Vertically center absolutely positioned nav buttons */
+.view-header .nav-btn[style*="absolute"] {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Position nav buttons very close to edges */
+.view-header .nav-btn[style*="left: 0"] {
+    left: -8px !important;
+}
+
+.view-header .nav-btn[style*="right: 0"] {
+    right: -8px !important;
+}
+
+.nav-btn:hover {
+    background: rgba(74, 144, 226, 0.1);
+    color: var(--moon-glow);
+}
+
+.nav-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* History specific styles */
+.history-view .session-item {
+    background: linear-gradient(135deg, rgba(20, 27, 61, 0.6), rgba(45, 27, 105, 0.2));
+    border-color: rgba(138, 180, 248, 0.1);
+}
+
+.history-view .session-item:hover {
+    border-color: var(--moon-glow);
+}
+
+/* Adjust general layout to ensure full height for scrolling views */
+.container {
+    overflow: hidden;
+    /* Prevent body scroll double scrollbar */
+}

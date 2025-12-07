@@ -126,6 +126,12 @@ async function initializeStorage() {
         currentSessionId: null
       }
     });
+  } else {
+    // Restore session state
+    if (data[CONFIG.STORAGE_KEY].currentSessionId) {
+      currentSessionId = data[CONFIG.STORAGE_KEY].currentSessionId;
+      console.log('[INIT] Restored currentSessionId:', currentSessionId);
+    }
   }
 
   if (!data[CONFIG.SETTINGS_KEY]) {
@@ -262,10 +268,22 @@ async function getCurrentSession() {
   return storage.sessions.find(s => s.id === currentSessionId);
 }
 
-async function createNewSession() {
+async function createNewSession(origin = 'auto', customName = null) {
   // Removed ensureInitialized() here
   const data = await chrome.storage.local.get(CONFIG.STORAGE_KEY);
   const storage = data[CONFIG.STORAGE_KEY] || { sessions: [] };
+
+  // If manual creation (user hit +), tag the current session as 'saved'
+  if (origin === 'manual' && currentSessionId) {
+    const currentSession = storage.sessions.find(s => s.id === currentSessionId);
+    if (currentSession) {
+      currentSession.type = 'saved';
+      // Apply the custom name to the session we are SAVING (archiving)
+      if (customName) {
+        currentSession.name = customName;
+      }
+    }
+  }
 
   const sessionId = `session_${Date.now()}`;
   const timestamp = Date.now();
@@ -286,6 +304,7 @@ async function createNewSession() {
 
   const newSession = {
     id: sessionId,
+    // New session starts blank/default. Custom name was for the previous one.
     name: formatSessionName(timestamp),
     created: timestamp,
     modified: timestamp,
@@ -307,15 +326,7 @@ async function createNewSession() {
 }
 
 function formatSessionName(timestamp) {
-  const date = new Date(timestamp);
-  const month = date.toLocaleString('en-US', { month: 'short' });
-  const day = date.getDate();
-  const time = date.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  });
-  return `Session - ${month} ${day} at ${time}`;
+  return '';
 }
 
 async function saveTabToCurrentSession(tab) {
@@ -548,7 +559,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           break;
 
         case 'createNewSession':
-          const newId = await createNewSession();
+          const newId = await createNewSession('manual', message.name);
           sendResponse({ success: true, sessionId: newId });
           break;
 
@@ -582,6 +593,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           sendResponse({ success: true, timestamp: Date.now() });
           break;
 
+        case 'openSavedSession':
+          await openSavedSession(message.sessionId);
+          sendResponse({ success: true });
+          break;
+
         default:
           sendResponse({ success: false, error: 'Unknown action' });
       }
@@ -592,6 +608,39 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   })();
   return true;
 });
+
+async function openSavedSession(sessionId) {
+  try {
+    const data = await chrome.storage.local.get(CONFIG.STORAGE_KEY);
+    const storage = data[CONFIG.STORAGE_KEY];
+    const session = storage.sessions.find(s => s.id === sessionId);
+
+    if (!session || !session.tabs || session.tabs.length === 0) return;
+
+    let startIndex = 0;
+    if (isIncognito) {
+      const allTabs = await chrome.tabs.query({});
+      const hasIncognito = allTabs.some(t => t.incognito);
+      if (!hasIncognito) {
+        const firstUrl = session.tabs[0]?.url || 'about:blank';
+        await chrome.windows.create({
+          url: firstUrl,
+          incognito: true,
+          focused: true
+        });
+        startIndex = 1;
+      }
+    }
+
+    for (let i = startIndex; i < session.tabs.length; i++) {
+      const tab = session.tabs[i];
+      await chrome.tabs.create({ url: tab.url, active: false });
+      await new Promise(r => setTimeout(r, 150));
+    }
+  } catch (error) {
+    console.error('[OPEN SESSION] Error:', error);
+  }
+}
 
 async function restoreSession(sessionId) {
   const data = await chrome.storage.local.get(CONFIG.STORAGE_KEY);

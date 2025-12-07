@@ -59,11 +59,11 @@ class SessionManager {
    */
   async getCurrentSession() {
     const storage = await this.getStorage();
-    
+
     if (!this.currentSessionId || !storage.sessions.find(s => s.id === this.currentSessionId)) {
       return null;
     }
-    
+
     return storage.sessions.find(s => s.id === this.currentSessionId);
   }
 
@@ -73,7 +73,7 @@ class SessionManager {
    */
   async ensureActiveSession() {
     const storage = await this.getStorage();
-    
+
     // If we already have an active session, return it
     if (this.currentSessionId && storage.sessions.find(s => s.id === this.currentSessionId)) {
       return this.currentSessionId;
@@ -85,7 +85,7 @@ class SessionManager {
         this.sessionCreationPromise = null;
       });
     }
-    
+
     this.currentSessionId = await this.sessionCreationPromise;
     return this.currentSessionId;
   }
@@ -132,7 +132,7 @@ class SessionManager {
 
     storage.currentSessionId = sessionId;
     this.currentSessionId = sessionId;
-    
+
     await this.saveStorage(storage);
     return sessionId;
   }
@@ -148,7 +148,7 @@ class SessionManager {
 
     const storage = await this.getStorage();
     const session = storage.sessions.find(s => s.id === this.currentSessionId);
-    
+
     if (!session) {
       throw new Error('Current session not found');
     }
@@ -186,13 +186,13 @@ class SessionManager {
   async updateTabInSession(tabId, tab) {
     const storage = await this.getStorage();
     const session = storage.sessions.find(s => s.id === this.currentSessionId);
-    
+
     if (!session) {
       throw new Error('Current session not found');
     }
 
     const tabIndex = session.tabs.findIndex(t => t.tabId === tabId);
-    
+
     if (tabIndex >= 0) {
       session.tabs[tabIndex] = {
         ...session.tabs[tabIndex],
@@ -201,7 +201,7 @@ class SessionManager {
         favicon: tab.favIconUrl !== undefined ? tab.favIconUrl : session.tabs[tabIndex].favicon,
         timestamp: Date.now()
       };
-      
+
       session.modified = Date.now();
       await this.saveStorage(storage);
     }
@@ -213,31 +213,31 @@ class SessionManager {
   async moveTabToClosedTabs(tabId) {
     const storage = await this.getStorage();
     const session = storage.sessions.find(s => s.id === this.currentSessionId);
-    
+
     if (!session) {
       return;
     }
 
     const tabIndex = session.tabs.findIndex(t => t.tabId === tabId);
-    
+
     if (tabIndex >= 0) {
       const tab = session.tabs[tabIndex];
       tab.closedAt = Date.now();
-      
+
       if (!session.closedTabs) {
         session.closedTabs = [];
       }
-      
+
       session.closedTabs.unshift(tab);
-      
+
       // Enforce closed tabs limit
       if (session.closedTabs.length > this.CONFIG.MAX_CLOSED_TABS) {
         session.closedTabs = session.closedTabs.slice(0, this.CONFIG.MAX_CLOSED_TABS);
       }
-      
+
       session.tabs = session.tabs.filter(t => t.tabId !== tabId);
       session.modified = Date.now();
-      
+
       await this.saveStorage(storage);
     }
   }
@@ -248,16 +248,16 @@ class SessionManager {
   async closeSession(sessionId) {
     const storage = await this.getStorage();
     const session = storage.sessions.find(s => s.id === sessionId);
-    
+
     if (session) {
       session.status = 'closed';
       session.modified = Date.now();
-      
+
       if (this.currentSessionId === sessionId) {
         this.currentSessionId = null;
         storage.currentSessionId = null;
       }
-      
+
       await this.saveStorage(storage);
     }
   }
@@ -279,7 +279,7 @@ class SessionManager {
   async updateSessionTimestamp(sessionId) {
     const storage = await this.getStorage();
     const session = storage.sessions.find(s => s.id === sessionId);
-    
+
     if (session) {
       session.modified = Date.now();
       await this.saveStorage(storage);
@@ -291,36 +291,28 @@ class SessionManager {
    */
   isSystemUrl(url) {
     if (!url) return true;
-    
-    return url === 'chrome://newtab/' || 
-           url === 'about:blank' || 
-           url === 'about:newtab' ||
-           url.startsWith('chrome://') || 
-           url.startsWith('about:') || 
-           url.startsWith('chrome-extension://') ||
-           url.startsWith('edge://') ||
-           url.startsWith('brave://') ||
-           url.startsWith('moz-extension://') ||
-           url.startsWith('opera://') ||
-           url.startsWith('vivaldi://') ||
-           url.startsWith('javascript:') ||
-           url.startsWith('data:') ||
-           url.startsWith('blob:');
+
+    return url === 'chrome://newtab/' ||
+      url === 'about:blank' ||
+      url === 'about:newtab' ||
+      url.startsWith('chrome://') ||
+      url.startsWith('about:') ||
+      url.startsWith('chrome-extension://') ||
+      url.startsWith('edge://') ||
+      url.startsWith('brave://') ||
+      url.startsWith('moz-extension://') ||
+      url.startsWith('opera://') ||
+      url.startsWith('vivaldi://') ||
+      url.startsWith('javascript:') ||
+      url.startsWith('data:') ||
+      url.startsWith('blob:');
   }
 
   /**
    * Helper: Format session name
    */
   formatSessionName(timestamp) {
-    const date = new Date(timestamp);
-    const month = date.toLocaleString('en-US', { month: 'short' });
-    const day = date.getDate();
-    const time = date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      hour12: false
-    });
-    return `Session - ${month} ${day} at ${time}`;
+    return '';
   }
 
   /**
@@ -337,12 +329,12 @@ class SessionManager {
   async deleteSession(sessionId) {
     const storage = await this.getStorage();
     storage.sessions = storage.sessions.filter(s => s.id !== sessionId);
-    
+
     if (storage.currentSessionId === sessionId) {
       storage.currentSessionId = null;
       this.currentSessionId = null;
     }
-    
+
     await this.saveStorage(storage);
   }
 
@@ -352,7 +344,7 @@ class SessionManager {
   async renameSession(sessionId, newName) {
     const storage = await this.getStorage();
     const session = storage.sessions.find(s => s.id === sessionId);
-    
+
     if (session) {
       session.name = newName;
       session.modified = Date.now();
@@ -372,7 +364,7 @@ class SessionManager {
     if (validIncognitoTabs.length === 0 && this.currentSessionId) {
       const storage = await this.getStorage();
       const session = storage.sessions.find(s => s.id === this.currentSessionId);
-      
+
       if (session) {
         session.status = 'closed';
         session.modified = Date.now();
@@ -393,7 +385,7 @@ class SessionManager {
     if (this.currentSessionId) {
       const storage = await this.getStorage();
       const session = storage.sessions.find(s => s.id === this.currentSessionId);
-      
+
       if (session) {
         session.status = 'saved';
         session.modified = Date.now();
@@ -411,7 +403,7 @@ class SessionManager {
   async getSessionDataForPreservation(sessionId) {
     const storage = await this.getStorage();
     const session = storage.sessions.find(s => s.id === sessionId);
-    
+
     if (session) {
       return {
         id: session.id,
@@ -448,7 +440,7 @@ class SessionManager {
   async updateSessionMetadataOnClosure(sessionId) {
     const storage = await this.getStorage();
     const session = storage.sessions.find(s => s.id === sessionId);
-    
+
     if (session) {
       session.status = 'closed';
       session.modified = Date.now();
@@ -464,23 +456,23 @@ class SessionManager {
    */
   async switchToSession(sessionId) {
     const storage = await this.getStorage();
-    
+
     // Validate: Session exists
     const targetSession = storage.sessions.find(s => s.id === sessionId);
     if (!targetSession) {
       throw new Error(`Session not found: ${sessionId}`);
     }
-    
+
     // Validate: Session is not already active
     if (this.currentSessionId === sessionId) {
       throw new Error(`Session is already active: ${sessionId}`);
     }
-    
+
     // Switch to the new session
     this.currentSessionId = sessionId;
     storage.currentSessionId = sessionId;
     targetSession.modified = Date.now();
-    
+
     await this.saveStorage(storage);
     return sessionId;
   }
@@ -492,35 +484,35 @@ class SessionManager {
    */
   async restoreSession(sessionId) {
     const storage = await this.getStorage();
-    
+
     // Validate: Session exists
     const session = storage.sessions.find(s => s.id === sessionId);
     if (!session) {
       throw new Error(`Session not found: ${sessionId}`);
     }
-    
+
     // Validate: Session is not already active
     if (this.currentSessionId === sessionId) {
       throw new Error(`Session is already active: ${sessionId}`);
     }
-    
+
     // Validate: Session has tabs to restore
     if (!session.tabs || session.tabs.length === 0) {
       throw new Error(`Session has no tabs to restore: ${sessionId}`);
     }
-    
+
     // Switch to the session without clearing its tabs
     this.currentSessionId = sessionId;
     storage.currentSessionId = sessionId;
-    
+
     // Update session metadata to reflect restoration
     session.modified = Date.now();
     if (session.name && session.name.endsWith(' (Closed)')) {
       session.name = session.name.replace(' (Closed)', '');
     }
-    
+
     await this.saveStorage(storage);
-    
+
     // Return the session data for the caller to use
     return {
       sessionId: session.id,
@@ -538,23 +530,23 @@ class SessionManager {
    */
   async getSessionForRestoration(sessionId) {
     const storage = await this.getStorage();
-    
+
     // Validate: Session exists
     const session = storage.sessions.find(s => s.id === sessionId);
     if (!session) {
       throw new Error(`Session not found: ${sessionId}`);
     }
-    
+
     // Validate: Session is not already active
     if (this.currentSessionId === sessionId) {
       throw new Error(`Session is already active: ${sessionId}`);
     }
-    
+
     // Validate: Session has tabs to restore
     if (!session.tabs || session.tabs.length === 0) {
       throw new Error(`Session has no tabs to restore: ${sessionId}`);
     }
-    
+
     // Return session data without modifying storage
     return {
       sessionId: session.id,
