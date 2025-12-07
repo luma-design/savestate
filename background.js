@@ -222,7 +222,7 @@ chrome.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
 
     const removedTab = session.tabs.find(t => t.tabId === tabId);
 
-    if (removedTab && !removeInfo.isWindowClosing) {
+    if (removedTab) {
       if (!session.closedTabs) session.closedTabs = [];
       removedTab.closedAt = Date.now();
       session.closedTabs.unshift(removedTab);
