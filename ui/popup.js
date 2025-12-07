@@ -25,15 +25,15 @@ function getFaviconUrl(favicon, tabUrl) {
       return favicon;
     }
   }
-  
+
   // Fallback: use Google's favicon service
   if (tabUrl) {
     try {
       const urlObj = new URL(tabUrl);
       return `https://www.google.com/s2/favicons?domain=${urlObj.hostname}&sz=32`;
-    } catch (e) {}
+    } catch (e) { }
   }
-  
+
   return '';
 }
 
@@ -68,44 +68,40 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadSessions() {
   try {
     const response = await chrome.runtime.sendMessage({ action: 'getSessions' });
-    
+
     if (response.success) {
       const data = response.data || { sessions: [] };
       sessions = data.sessions || [];
-      
-      // Check if we're in an incognito window (mobile-safe)
-      let isIncognito = false;
-      try {
-        const currentWindow = await chrome.windows.getCurrent();
-        isIncognito = currentWindow.incognito;
-      } catch (error) {
-        // On mobile, getCurrent() may fail - check tabs instead
-        console.log('getCurrent() failed, checking tabs:', error);
-        const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (tabs.length > 0) {
-          isIncognito = tabs[0].incognito;
-        }
-      }
 
-      // Show/hide incognito warning banner
-      const warningBanner = document.getElementById('incognitoWarning');
-      if (warningBanner) {
-        warningBanner.style.display = isIncognito ? 'none' : 'block';
-      }
-      console.log('[POPUP] Incognito mode:', isIncognito);
+      // Check execution context - in split mode, we are in the context we care about
+      let isIncognito = chrome.extension.inIncognitoContext;
 
-      // Only set current session if we're in incognito
-      if (isIncognito) {
-        currentSession = sessions.find(s => s.id === data.currentSessionId);
-      } else {
-        currentSession = null; // Don't show current session in regular windows
-      }
+      // In both modes, we want to show the current session if it exists
+      currentSession = sessions.find(s => s.id === data.currentSessionId);
 
       renderCurrentSession();
       renderSavedSessions();
+    } else {
+      // Response received but success=false
+      const errorMsg = response ? response.error : 'Unknown error';
+      document.querySelector('.container').innerHTML = `
+         <div style="padding:20px; color:red;">
+           <h3>Error Loading Sessions</h3>
+           <p>${errorMsg}</p>
+           <p>Mode: ${response && response.mode ? response.mode : 'Unknown'}</p>
+         </div>
+       `;
     }
   } catch (error) {
     console.error('Error loading sessions:', error);
+    document.querySelector('.container').innerHTML = `
+       <div style="padding:20px; color:red;">
+         <h3>Connection Error</h3>
+         <p>Could not connect to background service worker.</p>
+         <p>Detailed Error: ${error.message}</p>
+         <button onclick="location.reload()">Retry</button>
+       </div>
+    `;
   }
 }
 
@@ -116,9 +112,9 @@ function renderCurrentSession() {
     currentCount.textContent = '0';
     return;
   }
-  
+
   currentCount.textContent = currentSession.tabs.length;
-  
+
   currentTabs.innerHTML = currentSession.tabs.map(tab => {
     let hostname;
     try {
@@ -139,7 +135,7 @@ function renderCurrentSession() {
     </div>
   `;
   }).join('');
-  
+
   // Add event listeners for current tabs
   document.querySelectorAll('#currentTabs .tab-item-clickable').forEach(item => {
     item.addEventListener('click', handleSessionAction);
@@ -150,17 +146,17 @@ function renderCurrentSession() {
 function renderSavedSessions() {
   const displaySessions = filteredSessions.length > 0 ? filteredSessions : sessions;
   const savedOnly = displaySessions.filter(s => s.id !== currentSession?.id);
-  
+
   if (savedOnly.length === 0) {
     sessionList.innerHTML = '<p class="empty-state">No saved sessions</p>';
     return;
   }
-  
+
   sessionList.innerHTML = savedOnly.map(session => {
     const closedCount = (session.closedTabs || []).length;
     const isClosedVisible = showClosedTabs.get(session.id) || false;
     const isActiveVisible = showActiveTabs.get(session.id) || false;
-    
+
     return `
     <div class="session-item session-item-clickable" data-action="toggleActive" data-id="${session.id}">
       <div class="session-header">
@@ -177,10 +173,10 @@ function renderSavedSessions() {
           ${closedCount > 0 ? `
             <button class="toggle-closed-btn" data-action="toggleClosed" data-id="${session.id}" title="Toggle closed tabs">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                ${isClosedVisible ? 
-                  '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>' : 
-                  '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
-                }
+                ${isClosedVisible ?
+          '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>' :
+          '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+        }
               </svg>
             </button>
           ` : ''}
@@ -200,7 +196,7 @@ function renderSavedSessions() {
     </div>
   `;
   }).join('');
-  
+
   // Add event listeners to buttons
   console.log('[POPUP RENDER] Attaching event listeners...');
 
@@ -227,14 +223,14 @@ function renderActiveTabs(tabs) {
       <div class="active-tabs-header">Active Tabs</div>
       <div class="active-tabs-list">
         ${tabs.map(tab => {
-          let hostname;
-          try {
-            hostname = new URL(tab.url).hostname;
-          } catch (e) {
-            hostname = tab.url;
-          }
-          const safeFavicon = getFaviconUrl(tab.favicon, tab.url);
-          return `
+    let hostname;
+    try {
+      hostname = new URL(tab.url).hostname;
+    } catch (e) {
+      hostname = tab.url;
+    }
+    const safeFavicon = getFaviconUrl(tab.favicon, tab.url);
+    return `
             <div class="tab-item active-tab-item tab-item-clickable" data-action="openTab" data-url="${escapeHtml(tab.url)}">
               <div class="tab-favicon">
                 <img src="${escapeHtml(safeFavicon)}" alt="" onerror="this.style.display='none'">
@@ -245,7 +241,7 @@ function renderActiveTabs(tabs) {
               </div>
             </div>
           `;
-        }).join('')}
+  }).join('')}
       </div>
     </div>
   `;
@@ -258,14 +254,14 @@ function renderClosedTabs(closedTabs) {
       <div class="closed-tabs-header">Closed Tabs</div>
       <div class="closed-tabs-list">
         ${closedTabs.map(tab => {
-          let hostname;
-          try {
-            hostname = new URL(tab.url).hostname;
-          } catch (e) {
-            hostname = tab.url;
-          }
-          const safeFavicon = getFaviconUrl(tab.favicon, tab.url);
-          return `
+    let hostname;
+    try {
+      hostname = new URL(tab.url).hostname;
+    } catch (e) {
+      hostname = tab.url;
+    }
+    const safeFavicon = getFaviconUrl(tab.favicon, tab.url);
+    return `
             <div class="tab-item closed-tab-item tab-item-clickable" data-action="openTab" data-url="${escapeHtml(tab.url)}">
               <div class="tab-favicon">
                 <img src="${escapeHtml(safeFavicon)}" alt="" onerror="this.style.display='none'">
@@ -276,7 +272,7 @@ function renderClosedTabs(closedTabs) {
               </div>
             </div>
           `;
-        }).join('')}
+  }).join('')}
       </div>
     </div>
   `;
@@ -353,7 +349,7 @@ async function restoreClosedTabs(sessionId) {
   }
 
   console.log('[RESTORE CLOSED] Opening', session.closedTabs.length, 'tabs');
-  
+
   for (const tab of session.closedTabs) {
     window.open(tab.url, '_blank');
     await new Promise(r => setTimeout(r, 300));
@@ -399,11 +395,11 @@ async function restoreSession(sessionId) {
 async function deleteSession(sessionId) {
   const session = sessions.find(s => s.id === sessionId);
   const sessionCopy = { ...session };
-  
+
   try {
-    await chrome.runtime.sendMessage({ 
-      action: 'deleteSession', 
-      sessionId: sessionId 
+    await chrome.runtime.sendMessage({
+      action: 'deleteSession',
+      sessionId: sessionId
     });
     await loadSessions();
     showUndoMessage(sessionCopy);
@@ -423,20 +419,20 @@ function showUndoMessage(deletedSession) {
     <span>Session deleted</span>
     <button class="undo-btn">Undo</button>
   `;
-  
+
   document.body.appendChild(undoDiv);
-  
+
   // Undo handler
   const undoBtn = undoDiv.querySelector('.undo-btn');
   let undoTimeout;
-  
+
   undoBtn.addEventListener('click', async () => {
     clearTimeout(undoTimeout);
     undoDiv.remove();
-    
+
     try {
-      await chrome.runtime.sendMessage({ 
-        action: 'importSessions', 
+      await chrome.runtime.sendMessage({
+        action: 'importSessions',
         data: { sessions: [deletedSession] }
       });
       await loadSessions();
@@ -445,7 +441,7 @@ function showUndoMessage(deletedSession) {
       alert('Failed to restore session.');
     }
   });
-  
+
   // Auto-remove after 4 seconds
   undoTimeout = setTimeout(() => {
     undoDiv.classList.add('fade-out');
@@ -458,11 +454,11 @@ async function renameSessionPrompt(sessionId) {
   const session = sessions.find(s => s.id === sessionId);
   const currentName = session ? session.name : '';
   const newName = prompt('Enter new session name:', currentName);
-  
+
   if (newName && newName.trim() && newName !== currentName) {
     try {
-      await chrome.runtime.sendMessage({ 
-        action: 'renameSession', 
+      await chrome.runtime.sendMessage({
+        action: 'renameSession',
         sessionId: sessionId,
         newName: newName.trim()
       });
@@ -490,21 +486,21 @@ async function createNewSession() {
 // Search/filter sessions
 function filterSessions() {
   const query = searchInput.value.toLowerCase();
-  
+
   if (!query) {
     filteredSessions = [];
     renderSavedSessions();
     return;
   }
-  
-  filteredSessions = sessions.filter(session => 
+
+  filteredSessions = sessions.filter(session =>
     session.name.toLowerCase().includes(query) ||
-    session.tabs.some(tab => 
+    session.tabs.some(tab =>
       tab.title.toLowerCase().includes(query) ||
       tab.url.toLowerCase().includes(query)
     )
   );
-  
+
   renderSavedSessions();
 }
 
@@ -512,7 +508,7 @@ function filterSessions() {
 async function exportSessions() {
   try {
     const response = await chrome.runtime.sendMessage({ action: 'exportSessions' });
-    
+
     if (response.success) {
       const dataStr = JSON.stringify(response.data, null, 2);
       const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -533,14 +529,14 @@ async function exportSessions() {
 async function importSessionsFromFile(event) {
   const file = event.target.files[0];
   if (!file) return;
-  
+
   const reader = new FileReader();
   reader.onload = async (e) => {
     try {
       const data = JSON.parse(e.target.result);
-      await chrome.runtime.sendMessage({ 
-        action: 'importSessions', 
-        data: data 
+      await chrome.runtime.sendMessage({
+        action: 'importSessions',
+        data: data
       });
       loadSessions();
       alert('Sessions imported successfully');
@@ -550,7 +546,7 @@ async function importSessionsFromFile(event) {
     }
   };
   reader.readAsText(file);
-  
+
   event.target.value = '';
 }
 
@@ -575,15 +571,15 @@ function formatDate(timestamp) {
   const date = new Date(timestamp);
   const now = new Date();
   const diff = now - date;
-  
+
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
-  
+
   if (minutes < 1) return 'just now';
   if (minutes < 60) return `${minutes}m ago`;
   if (hours < 24) return `${hours}h ago`;
   if (days < 7) return `${days}d ago`;
-  
+
   return date.toLocaleDateString();
 }
